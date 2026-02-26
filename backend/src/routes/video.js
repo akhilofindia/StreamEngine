@@ -63,13 +63,56 @@ router.get('/admin/all', protect, restrictTo('admin'), async (req, res) => {
 // 2. POST ROUTES (Creation)
 // ==========================================
 
+const User = require('../models/User');
+
+// Storage enforcement middleware
+const checkStorageLimit = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const limitMB = user?.storageLimitMB ?? 500;
+
+    const userVideos = await Video.find({ uploadedBy: req.user._id });
+    const usedBytes = userVideos.reduce((acc, v) => acc + (Number(v.size) || 0), 0);
+    const usedMB = usedBytes / (1024 * 1024);
+
+    if (usedMB >= limitMB) {
+      return res.status(413).json({
+        message: `Storage limit reached. You have used ${usedMB.toFixed(1)} MB of your ${limitMB} MB limit. Please delete some videos or contact your admin.`,
+        usedMB: parseFloat(usedMB.toFixed(2)),
+        limitMB,
+      });
+    }
+
+    req.storageInfo = { usedMB, limitMB };
+    next();
+  } catch (err) {
+    res.status(500).json({ message: 'Could not verify storage limit' });
+  }
+};
+
+// GET storage info for current user
+router.get('/storage-info', protect, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const limitMB = user?.storageLimitMB ?? 500;
+    const userVideos = await Video.find({ uploadedBy: req.user._id });
+    const usedBytes = userVideos.reduce((acc, v) => acc + (Number(v.size) || 0), 0);
+    const usedMB = parseFloat((usedBytes / (1024 * 1024)).toFixed(2));
+    res.json({ usedMB, limitMB, usedPercentage: Math.min((usedMB / limitMB) * 100, 100) });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 router.post(
   '/upload',
   protect,
   restrictTo('editor', 'admin'),
-  upload.single('video'),     
+  checkStorageLimit,
+  upload.single('video'),
   uploadVideo
 );
+
 
 // ==========================================
 // 3. PATCH ROUTES (Updates/Assignments)

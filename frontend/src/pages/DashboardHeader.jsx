@@ -1,28 +1,67 @@
 // src/pages/DashboardHeader.jsx
 export default function DashboardHeader({ user, handleLogout }) {
-  console.log(user.email,user.organizationId)
+  const roleChipClass =
+    user?.role === 'admin' ? 'chip chip-admin' :
+    user?.role === 'editor' ? 'chip chip-editor' :
+    'chip chip-viewer';
+
+  const roleIcon =
+    user?.role === 'admin' ? '⚡' :
+    user?.role === 'editor' ? '✏️' : '👁';
+
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-      <h1 style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#1f2937' }}>
-        Welcome, {user?.email || 'User'}!
-      </h1>
-      <h3 style={{ color: '#111827', fontSize: '2rem', fontWeight: '800' }}>
-        {user.organizationId}
-      </h3>
-      <button
-        onClick={handleLogout}
-        style={{
-          backgroundColor: '#dc2626',
-          color: 'white',
-          padding: '0.75rem 1.5rem',
-          borderRadius: '0.5rem',
-          fontWeight: '500',
-          cursor: 'pointer',
-          border: 'none',
-        }}
-      >
-        Logout
-      </button>
-    </div>
+    <nav className="topnav" style={{ marginBottom: '2rem' }}>
+      {/* Logo */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexShrink: 0 }}>
+        <span style={{ fontSize: '1.3rem' }}>⚡</span>
+        <span className="topnav-logo">Stream Engine</span>
+      </div>
+
+      {/* Center: org info */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: '0.5rem',
+        background: 'rgba(255,255,255,0.04)', borderRadius: '9999px',
+        padding: '0.35rem 1rem', border: '1px solid var(--border)',
+      }}>
+        <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontFamily: 'var(--font-display)', letterSpacing: '0.1em' }}>ORG</span>
+        <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontWeight: 500 }}>
+          {user?.organizationId || '—'}
+        </span>
+      </div>
+
+      {/* Right: user + logout */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
+          <span style={{ fontSize: '0.8rem', color: 'var(--text-primary)', fontWeight: 500 }}>
+            {user?.email}
+          </span>
+          <span className={roleChipClass} style={{ marginTop: '0.2rem' }}>
+            {roleIcon} {user?.role}
+          </span>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          title="Sign out"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.4rem',
+            background: 'rgba(255,68,68,0.08)', border: '1px solid rgba(255,68,68,0.25)',
+            color: 'var(--accent-red)', borderRadius: 'var(--radius-md)',
+            padding: '0.5rem 1rem', cursor: 'pointer', fontFamily: 'var(--font-body)',
+            fontSize: '0.85rem', fontWeight: 500, transition: 'var(--transition)',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.background = 'rgba(255,68,68,0.18)';
+            e.currentTarget.style.boxShadow = 'var(--glow-red)';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.background = 'rgba(255,68,68,0.08)';
+            e.currentTarget.style.boxShadow = 'none';
+          }}
+        >
+          <span>↩</span> Logout
+        </button>
+      </div>
+    </nav>
   );
 }

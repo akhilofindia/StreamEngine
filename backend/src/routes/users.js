@@ -121,4 +121,36 @@ router.delete('/:id', protect, restrictTo('admin'), async (req, res) => {
   }
 });
 
+// Admin: update user storage limit
+router.patch('/:id/storage-limit', protect, restrictTo('admin'), async (req, res) => {
+  try {
+    const { limitMB } = req.body;
+    if (!limitMB || isNaN(limitMB) || Number(limitMB) < 1) {
+      return res.status(400).json({ message: 'limitMB must be a positive number' });
+    }
+
+    const user = await User.findOne({
+      _id: req.params.id,
+      organizationId: req.user.organizationId,
+    });
+
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.storageLimitMB = Number(limitMB);
+    await user.save();
+
+    await AuditLog.create({
+      action: 'STORAGE_LIMIT_UPDATE',
+      performedBy: req.user._id,
+      targetId: user._id,
+      organizationId: req.user.organizationId,
+      details: `Changed storage limit for ${user.email} to ${limitMB} MB`,
+    });
+
+    res.json({ message: `Storage limit updated to ${limitMB} MB`, storageLimitMB: user.storageLimitMB });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error updating storage limit' });
+  }
+});
+
 module.exports = router;

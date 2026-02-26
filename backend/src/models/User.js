@@ -29,8 +29,14 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true, 
     index: true,
-    default: 'org_main' // Default for existing users
+    default: 'org_main'
+  },
+  storageLimitMB: {
+    type: Number,
+    default: 500, // Default 500MB per user
+    min: 1,
   }
+
 });
 
 // IMPORTANT: Password hashing middleware
