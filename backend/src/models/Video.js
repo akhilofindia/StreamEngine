@@ -18,8 +18,15 @@ const videoSchema = new mongoose.Schema({
   },
   uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   sensitivity: { type: String, default: 'safe' },
-  isShared: { type: Boolean, default: false }, // ← NEW FIELD
+  isShared: { type: Boolean, default: false }, 
+  allowedViewers: [{ type: String }],
   createdAt: { type: Date, default: Date.now },
+  // Add to Video Schema
+  organizationId: { 
+    type: String, 
+    required: true, 
+    index: true 
+  }
 });
 
 module.exports = mongoose.model('Video', videoSchema);
