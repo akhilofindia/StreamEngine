@@ -2,6 +2,8 @@
 
 A high-performance, premium video management and streaming application built with the MERN stack, featuring real-time updates, cloud storage, and robust administrative controls.
 
+Here is the live link: https://stream-engine-pulse.netlify.app/login
+
 ---
 
 ## 📂 Project Structure
@@ -16,7 +18,6 @@ A high-performance, premium video management and streaming application built wit
 │   ├── src/            # Components, pages, layouts, contexts
 │   └── tailwind.config.js
 ├── README.md           # Original documentation
-└── README2.md          # Project summary (this file)
 ```
 
 ## ✨ Key Features
