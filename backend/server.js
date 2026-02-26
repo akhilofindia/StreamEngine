@@ -41,18 +41,22 @@ mongoose.connect(process.env.MONGO_URI)
 const authRoutes = require('./src/routes/auth');
 const testRoutes = require('./src/routes/test');
 const videoRoutes = require('./src/routes/video');
-const usersRoutes = require('./src/routes/users')
+const usersRoutes = require('./src/routes/users');
+const adminRoutes = require('./src/routes/admin');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/test', testRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/users', usersRoutes)
+app.use('/api/admin', adminRoutes)
+
 
 // Serve uploads with CORS headers
 app.use('/uploads', (req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5173');
   res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
   next();
 }, express.static('uploads'));
 
